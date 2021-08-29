@@ -5,7 +5,7 @@
 #include <errno.h>
 #include <string.h>
 
-void process_file(char *file_path, int chunk_size)
+void process_file(char *file_path)
 {
     FILE *fp;
 
@@ -25,12 +25,12 @@ void process_file(char *file_path, int chunk_size)
 
     rewind(fp);
 
-    int payloads = file_size/chunk_size;
-    char payload[chunk_size];
+    char payload[CQ_DATA_MAX_LEN];
 
-    while (fgets(payload, chunk_size, fp) != NULL) {
+    while (fgets(payload, CQ_DATA_MAX_LEN, fp) != NULL) {
         printf("chunk: %s\n", payload);
-        send_data_to_dll(payload, chunk_size);
+        send_data_to_dll(payload, CQ_DATA_MAX_LEN);
+        memset(payload, EOF, sizeof(payload));
     }
 
     fclose(fp);
@@ -46,7 +46,7 @@ void mount_file(char *filename)
     int file_is_mounted = 0;
 
     while(!file_is_mounted) {
-        get_data_from_dll(chunk_data, &chunk_len);
+        get_data_from_app(chunk_data, &chunk_len);
 
         for (int i = 0; i < chunk_len; i++){
             fwrite(chunk_data, chunk_len, 1, fp);
