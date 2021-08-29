@@ -1,7 +1,16 @@
 #ifndef _APPLICATION_H_
 #define _APPLICATION_H_
 
-// Recebe o caminho do arquivo, abre e envia o arquivo para camada n-1 via fila
-void process_message(char *file_path, int payload_size);
+/*
+Recebe o caminho do arquivo, quebra este arquivo em múltiplas chunks
+e os envia para a camada N-1
+*/
+void process_file(char *file_path, int chunk_size);
+
+/*
+Recebe o nome do arquivo e monta os pacotes, presentes na fila, de tamanho
+chunk_size em um arquivo com esse nome
+*/
+void mount_file(char *filename, int chunk_size);
 
 #endif

@@ -1,12 +1,13 @@
+#include "DataLinkLayerInterface.h"
 #include "Application.h"
 #include <stdio.h>
 #include <stdlib.h>
 
-void process_message(char *file_path, int payload_size)
+void process_file(char *file_path, int chunk_size)
 {
     FILE *fp;
 
-    fp  = fopen(file_path, "r");
+    fp = fopen(file_path, "r");
 
     if (fp == NULL) {
         //Tratar erro de forma eficiente
@@ -21,13 +22,18 @@ void process_message(char *file_path, int payload_size)
 
     rewind(fp);
 
-    int payloads = file_size/payload_size;
-    char payload[payload_size];
+    int payloads = file_size/chunk_size;
+    char payload[chunk_size];
 
-    while (fgets(payload, payload_size, fp) != NULL)
-
+    while (fgets(payload, chunk_size, fp) != NULL) {
+        printf("chunk: %s\n", payload);
+        send_data_to_dll(payload, chunk_size);
+    }
 
     fclose(fp);
+}
 
+void mount_file(char *filename, int chunk_size)
+{
 
 }
