@@ -1,0 +1,38 @@
+#ifndef _COMMUNICATION_QUEUE_H_
+#define _COMMUNICATION_QUEUE_H_
+
+#include "Params.h"
+
+// Inicializa a fila de comunicação interprocessos
+void initialize_communication_queue();
+
+// Envia dados para a camada de enlace de dados (N-1)
+// A função bloqueará a execução até que os dados sejam enviados
+//
+// data - array que contem os dados a serem enviados
+// data_len - o tamanho em bytes do array a ser enviado (deve ser menor que CQ_DATA_MAX_LEN)
+void send_data_to_dll(char * data, int data_len);
+
+// Recebe dados da camada de enlace de dados (N-1)
+// data - o array que será preenchido com os dados
+// data_len - a quantidade de bytes que o array recebeu
+// data_len é sempre menor ou igual que CQ_DATA_MAX_LEN
+void get_data_from_dll(char ** data, int * data_len);
+
+// Envia dados para a camada de aplicacao (N)
+// A função bloqueará a execução até que os dados sejam enviados
+//
+// data - array que contem os dados a serem enviados
+// data_len - o tamanho em bytes do array a ser enviado (deve ser menor que CQ_DATA_MAX_LEN)
+// data_len é sempre menor ou igual que CQ_DATA_MAX_LEN
+void send_data_to_app(char * data, int data_len);
+
+// Recebe dados da camada da aplicao (N)
+// A função bloqueará a execução até que os dados sejam recebidos
+//
+// data - o array que será preenchido com os dados
+// data_len - a quantidade de bytes que o array recebeu
+// data_len é sempre menor ou igual que CQ_DATA_MAX_LEN
+void get_data_from_app(char ** data, int * data_len);
+
+#endif
