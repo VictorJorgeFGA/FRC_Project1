@@ -1,10 +1,10 @@
-#ifndef _COMMUNICATION_QUEUE_H_
-#define _COMMUNICATION_QUEUE_H_
+#ifndef _DATA_LINK_INTERFACE_H_
+#define _DATA_LINK_INTERFACE_H_
 
 #include "Params.h"
 
 // Inicializa a fila de comunicação interprocessos
-void initialize_communication_queue();
+void initialize_dll_interface();
 
 // Envia dados para a camada de enlace de dados (N-1)
 // A função bloqueará a execução até que os dados sejam enviados
