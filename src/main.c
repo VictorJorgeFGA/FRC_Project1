@@ -10,7 +10,7 @@
 
 int main(int argc, char ** argv)
 {
-    process_file("../file.txt", 10);
+    process_file("file.txt", 10);
 
     return 0;
 }

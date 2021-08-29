@@ -2,16 +2,19 @@
 #include "Application.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
+#include <string.h>
 
 void process_file(char *file_path, int chunk_size)
 {
     FILE *fp;
 
+    printf("%s\n", file_path);
     fp = fopen(file_path, "r");
 
     if (fp == NULL) {
         //Tratar erro de forma eficiente
-        printf("Error when opening file!\n");
+        printf("%s\n", strerror(errno));
         exit(0);
     }
 
@@ -33,7 +36,24 @@ void process_file(char *file_path, int chunk_size)
     fclose(fp);
 }
 
-void mount_file(char *filename, int chunk_size)
+void mount_file(char *filename)
 {
+    FILE *fp;
+    fp = fopen(filename, "w");
+
+    char chunk_data[CQ_DATA_MAX_LEN];
+    int chunk_len;
+    int file_is_mounted = 0;
+
+    while(!file_is_mounted) {
+        get_data_from_dll(chunk_data, &chunk_len);
+
+        for (int i = 0; i < chunk_len; i++){
+            fwrite(chunk_data, chunk_len, 1, fp);
+            file_is_mounted = (chunk_data[i] == EOF);
+        }
+    }
+
+    fclose(fp);
 
 }
