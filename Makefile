@@ -6,16 +6,15 @@ INCFOLDER := inc/
 SRCFOLDER := src/
 # .o
 OBJFOLDER := obj/
-CC := g++
+CC := gcc
 CFLAGS := -std=c99
-LINKFLAGS :=
-SRCFILES := $(wildcard src/*.cpp)
+SRCFILES := $(wildcard src/*.c)
 
-all: $(SRCFILES:src/%.cpp=obj/%.o)
-	$(CC) $(CFLAGS) obj/*.o -o bin/prog $(LINKFLAGS)
+all: $(SRCFILES:src/%.c=obj/%.o)
+	$(CC) $(CFLAGS) obj/*.o -o bin/prog
 
-obj/%.o: src/%.cpp
-	$(CC) $(CFLAGS) -c $< -o $@ -I./inc $(LINKFLAGS)
+obj/%.o: src/%.c
+	$(CC) $(CFLAGS) -c $< -o $@ -I./inc
 
 run: bin/prog
 	bin/prog
