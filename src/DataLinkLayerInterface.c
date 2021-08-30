@@ -71,7 +71,8 @@ void send_data_to_dll(char * data, int data_len)
 
 void get_data_from_dll(char * data, int * data_len)
 {
-    int bytes_received = mq_receive(up_queue, data, CQ_DATA_MAX_LEN, 0);
+    int priority;
+    int bytes_received = mq_receive(up_queue, data, CQ_DATA_MAX_LEN, &priority);
     if (bytes_received < 0) {
         printf("An error occurred when receiving data from dll\n");
         printf("Error: %s\n", strerror(errno));
@@ -91,7 +92,8 @@ void send_data_to_app(char * data, int data_len)
 
 void get_data_from_app(char * data, int * data_len)
 {
-    int bytes_received = mq_receive(down_queue, data, CQ_DATA_MAX_LEN, 0);
+    int priority;
+    int bytes_received = mq_receive(down_queue, data, CQ_DATA_MAX_LEN, &priority);
     if (bytes_received < 0) {
         printf("An error occurred when receiving data from app\n");
         printf("Error: %s\n", strerror(errno));
