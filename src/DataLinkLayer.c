@@ -18,6 +18,12 @@ static long long outcoming_frame_id = 0;
 
 static int layer_state;
 
+void show_buffer(char * buffer, int buffer_len)
+{
+    for (int i = 0; i < buffer_len; i++)
+        printf("%c", buffer[i]);
+}
+
 void initialize_dll(int t_operation_mode, char * host_address, char * host_port, char * receiver_address, char * receiver_port)
 {
     initialize_dll_interface();
@@ -38,12 +44,20 @@ void run_dll()
         get_data_from_queue();
         pack_message_from_queue_buffer();
         delivery_frame();
+
+#ifdef DEBUG
+        printf("\nSending frame ID: %lld\n", outcoming_frame_id);
+#endif
     }
 
     while (operation_mode == RECEIVER) {
         get_data_from_sender();
         unpack_message_from_frame_buffer();
         send_data_to_queue();
+
+#ifdef DEBUG
+        printf("Receiving frame ID: \n%lld\n", incoming_frame_id);
+#endif
     }
 }
 
@@ -51,10 +65,16 @@ void get_data_from_queue()
 {
     int nothing;
     get_data_from_app(queue_buffer, &nothing);
+#ifdef DEBUG
+    show_buffer(queue_buffer, CQ_DATA_MAX_LEN);
+#endif
 }
 
 void send_data_to_queue()
 {
+#ifdef DEBUG
+    show_buffer(queue_buffer, CQ_DATA_MAX_LEN);
+#endif
     send_data_to_app(queue_buffer, CQ_DATA_MAX_LEN);
 }
 

@@ -9,4 +9,6 @@
 #define HEADER_PDU_SIZE 8
 #define PDU_SIZE (MESSAGE_PDU_SIZE + HEADER_PDU_SIZE)
 
+// #define DEBUG 0
+
 #endif

@@ -17,9 +17,28 @@ int main(int argc, char ** argv)
     } else {
         initialize_dll_interface();
         if (argv[1][0] == 'S') {
-            process_file("file.mp3");
+            char cmd[150];
+            while (1)
+            {
+                printf("Enter the file name to be sent, or \\exit to exit: ");
+                scanf("%s", cmd);
+
+                if (cmd[0] == '\\')
+                    break;
+                else
+                    process_file(cmd);
+            }
         } else {
-            mount_file("file_copy.exe");
+            while (1) {
+                char cmd[150];
+                printf("Enter the file name to be received, or \\exit to exit: ");
+                scanf("%s", cmd);
+
+                if (cmd[0] == '\\')
+                    break;
+                else
+                    mount_file(cmd);
+            }
         }
         shut_down_dll_interface();
     }
