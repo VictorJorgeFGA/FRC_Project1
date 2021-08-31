@@ -35,7 +35,7 @@ void initialize_socket(char * host_address, char * host_port, char * receiver_ad
     }
 
     if (bind(socket_data, (struct sockaddr *) &host_data, sizeof(host_data)) < 0) {
-        printf("Unable to bind socket to host port\nExiting...\n");
+        printf("Unable to bind socket to host port %d\nExiting...\n", ntohs(host_data.sin_port));
         printf("Error: %s\n", strerror(errno));
         exit(1);
     }
