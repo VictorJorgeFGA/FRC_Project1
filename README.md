@@ -8,7 +8,7 @@ Neste momento, vários arquivos poderão ser enviados o quanto se queira. O arqu
 
 ## Utilização
 
-Confira este [vídeo]() que demonstra a utilização.
+Confira este [vídeo](https://youtu.be/xThKL7FVCgs) que demonstra a utilização.
 
 Assumindo que a aplicação será executada em ambiente Linux, em específico no Ubuntu, os seguintes passos poderão ser seguidos para a correta execução:
 
@@ -56,7 +56,7 @@ Para inicair a camada de enlace de dados, execute o seguinte comando:
 >
 > Caso você esteja executando em loopback, atente-se para utilizar portas diferentes para entrada e saída de dados
 ```bash
-./bin/prog 0.0.0.0 5000 <endereco_destinatario> 5000
+./bin/prog 0.0.0.0 5000 <endereco_destinatario> 5000 SENDER
 ```
 
 Em seguida a aplicação poderá ser iniciada através do seguinte comando:
@@ -71,7 +71,7 @@ Para inicair a camada de enlace de dados, execute o seguinte comando:
 >
 > Caso você esteja executando em loopback, atente-se para utilizar portas diferentes para entrada e saída de dados
 ```bash
-./bin/prog 0.0.0.0 5000 <endereco_remetente> 5000
+./bin/prog 0.0.0.0 5000 <endereco_remetente> 5000 RECEIVER
 ```
 
 Em seguida a aplicação poderá ser iniciada através do seguinte comando:
