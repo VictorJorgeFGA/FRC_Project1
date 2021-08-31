@@ -14,6 +14,7 @@
 // receiver_address - Endereço do par para enviar dados
 // receiver_port - Porta aberta pelo par para comunicação
 void initialize_dll(int operation_mode, char * host_address, char * host_port, char * receiver_address, char * receiver_port);
+void shut_down_dll();
 
 // Roda o loop infinito da camada
 void run_dll();
@@ -22,6 +23,7 @@ void run_dll();
 // CORE DA CAMADA
 
 // FUNCOES PARA INTERFACE COM CAMADA N ---------
+
 // Interrompe a execução do programa até receber algum dado da fila e preenche o buffer com dados
 static void get_data_from_queue();
 
@@ -53,6 +55,7 @@ static int send_ok_confirmation_frame();
 // -------------------------------------------
 
 // FUNCOES PARA FLUXO DE DADOS ------
+
 // Envia o frame salvo no buffer para o destinatário.
 // Bloqueia a execução da camada até que o frame seja enviado
 // com sucesso, i.e., o frame seja enviado e a confirmação seja
@@ -70,6 +73,11 @@ static int send_frame();
 // pacote de confirmação dentro da janela de tempo configurada (timeout)
 static int get_confirmation_frame();
 
+// Checa o frame de confirmação
+// Retorna 1 se o frame de confirmação apontar erro
+// Retorna 0 caso contrario
+static int check_confirmation_frame();
+
 // Recebe um frame do destinatário e salva no buffer
 // Retorna 1 se não foi possível enviar o quadro completo
 // Retorna 0 em caso de sucesso
@@ -81,6 +89,7 @@ static void get_data_from_sender();
 // ------------------------------------------
 
 // FUNCOES PARA REALIZAR ENQUADRAMENTO ------
+
 // Realiza enquadramento da mensagem contida no buffer da fila interprocesso
 static void pack_message_from_queue_buffer();
 

@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include <string.h> /* memset() */
 #include <stdlib.h>
+#include <errno.h>
 
 static int socket_data;
 
@@ -29,11 +30,13 @@ void initialize_socket(char * host_address, char * host_port, char * receiver_ad
     socket_data = socket(AF_INET, SOCK_DGRAM, 0);
     if (socket_data < 0) {
         printf("Unable to open socket\nExiting...\n");
+        printf("Error: %s\n", strerror(errno));
         exit(1);
     }
 
     if (bind(socket_data, (struct sockaddr *) &host_data, sizeof(host_data)) < 0) {
         printf("Unable to bind socket to host port\nExiting...\n");
+        printf("Error: %s\n", strerror(errno));
         exit(1);
     }
 
@@ -45,6 +48,11 @@ void initialize_socket(char * host_address, char * host_port, char * receiver_ad
         inet_ntoa(receiver_data.sin_addr),
         ntohs(receiver_data.sin_port)
     );
+}
+
+void shut_down_socket()
+{
+    close(socket_data);
 }
 
 int send_data_through_socket(char * data_buffer, int data_buffer_size)

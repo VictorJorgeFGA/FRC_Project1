@@ -6,11 +6,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#define WAITING_APP 0
-#define SENDING 1
-#define RECEIVING 2
-#define WAITING_PEER 3
-
 static int operation_mode;
 
 static char queue_buffer[CQ_DATA_MAX_LEN];
@@ -23,13 +18,18 @@ static long long outcoming_frame_id = 0;
 
 static int layer_state;
 
-void initialize_dll(int operation_mode, char * host_address, char * host_port, char * receiver_address, char * receiver_port)
+void initialize_dll(int t_operation_mode, char * host_address, char * host_port, char * receiver_address, char * receiver_port)
 {
+    initialize_dll_interface();
     initialize_socket(host_address, host_port, receiver_address, receiver_port);
-    if (operation_mode == SENDER)
-        layer_state = WAITING_APP;
-    else
-        layer_state = WAITING_PEER;
+    operation_mode = t_operation_mode;
+    printf("Data Link Layer initialized as %s successfully!\n", operation_mode == SENDER ? "SENDER" : "RECEIVER");
+}
+
+void shut_down_dll()
+{
+    shut_down_dll_interface();
+    shut_down_socket();
 }
 
 void run_dll()
@@ -87,8 +87,14 @@ int send_ok_confirmation_frame()
 
 void delivery_frame()
 {
-    while (send_frame());
-    while (get_confirmation_frame());
+    do {
+        while (send_frame()) {
+            printf("Frame sending failed. Trying again...\n");
+        }
+        while (get_confirmation_frame()) {
+            printf("Frame receiving failed. Trying again...\n");
+        }
+    } while (check_confirmation_frame());
 }
 
 int send_frame()
@@ -101,9 +107,21 @@ int get_confirmation_frame()
     return receive_data_through_socket(incoming_frame_buffer, PDU_SIZE);
 }
 
+int check_confirmation_frame()
+{
+    int is_error = 0;
+    for (int i = 0; i < PDU_SIZE; i++) {
+        if (incoming_frame_buffer[i] == 0xFF)
+            is_error = 1;
+    }
+    if (is_error) {
+        printf("Got an error frame\n");
+    }
+    return is_error;
+}
+
 int receive_frame()
 {
-    memset(incoming_frame_buffer, 0x0, PDU_SIZE);
     return receive_data_through_socket(incoming_frame_buffer, PDU_SIZE);
 }
 

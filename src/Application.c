@@ -25,15 +25,16 @@ void process_file(char *file_path)
 
     rewind(fp);
 
-    char payload[CQ_DATA_MAX_LEN];
+    char chunk[CQ_DATA_MAX_LEN];
 
-    memset(payload, EOF, sizeof(payload));
     int bytes_read;
-    while (bytes_read = fread(payload, sizeof(char), CQ_DATA_MAX_LEN, fp)) {
-        printf("chunk: %s\n", payload);
-        send_data_to_dll(payload, CQ_DATA_MAX_LEN);
-        memset(payload, EOF, sizeof(payload));
+    while (bytes_read = fread(chunk + CQ_HEADER_LEN, sizeof(char), CQ_MESSAGE_LEN, fp)) {
+        printf("Reading chunk...\n");
+        *((int *)chunk) = bytes_read;
+        send_data_to_dll(chunk, CQ_DATA_MAX_LEN);
     }
+    memset(chunk, 0x0, CQ_DATA_MAX_LEN);
+    send_data_to_dll(chunk, CQ_DATA_MAX_LEN);
 
     fclose(fp);
 }
@@ -45,17 +46,17 @@ void mount_file(char *filename)
 
     char chunk_data[CQ_DATA_MAX_LEN];
     int chunk_len;
-    int file_is_mounted = 0;
 
-    while(!file_is_mounted) {
+    while(1) {
         get_data_from_app(chunk_data, &chunk_len);
-        printf("Processing chunk: %s\n", chunk_data);
+        printf("Processing chunk...\n");
 
-        for (int i = 0; i < chunk_len; i++) {
-            if (chunk_data[i] == EOF) {
-                file_is_mounted = 1;
-                break;
-            }
+        int useful_msg_len = *((int *)chunk_data);
+        if (useful_msg_len == 0)
+            break;
+
+        for (int i = CQ_HEADER_LEN; i < CQ_HEADER_LEN + useful_msg_len; i++) {
+            printf("%c", chunk_data[i]);
             fputc(chunk_data[i], fp);
         }
     }
