@@ -4,6 +4,8 @@
 #define SENDER 0
 #define RECEIVER 1
 
+#define PDU_HEADER_SIZE 8
+
 // INTERFACE DA CAMADA
 
 // Inicializa a camada de enlace de dados
@@ -13,12 +15,16 @@
 // host_port - Porta aberta para comunicação da camada que está executando este código
 // receiver_address - Endereço do par para enviar dados
 // receiver_port - Porta aberta pelo par para comunicação
-void initialize_dll(int operation_mode, char * host_address, char * host_port, char * receiver_address, char * receiver_port);
+void initialize_dll(char * host_port, char * receiver_address, char * receiver_port, int t_pdu_size);
 void shut_down_dll();
 
 // Roda o loop infinito da camada
 void run_dll();
 
+// Altera para o modo verbose
+// 1 para ativar modo verboso
+// 0 para desativar
+void set_verbose(int value);
 
 // CORE DA CAMADA
 
@@ -56,6 +62,13 @@ static int send_ok_confirmation_frame();
 
 // FUNCOES PARA FLUXO DE DADOS ------
 
+// Quebra em chunks os dados contidos no buffer da fila e envia para o HOST B.
+static void send_data();
+
+// Recebe os chunks do HOST A, monta a mensagem e entrega
+// para a camada acima
+static void get_data();
+
 // Envia o frame salvo no buffer para o destinatário.
 // Bloqueia a execução da camada até que o frame seja enviado
 // com sucesso, i.e., o frame seja enviado e a confirmação seja
@@ -85,7 +98,7 @@ static int receive_frame();
 
 // Interrompe a execução da camada até receber um frame valido do par
 // Quadros de confirmação são enviados
-static void get_data_from_sender();
+static void get_frame_from_sender();
 // ------------------------------------------
 
 // FUNCOES PARA REALIZAR ENQUADRAMENTO ------

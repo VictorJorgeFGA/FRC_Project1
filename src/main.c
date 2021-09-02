@@ -4,15 +4,15 @@
 // TODO podar includes
 #include "Application.h"
 #include "DataLinkLayerInterface.h"
-#include "Params.h"
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 int main(int argc, char ** argv)
 {
     if (argc > 2) {
-        initialize_dll(argv[5][0] == 'S' ? SENDER : RECEIVER, argv[1], argv[2], argv[3], argv[4]);
-        run_dll();
+        initialize_dll(argv[1], argv[2], argv[3], atoi(argv[4]));
+        // run_dll();
         shut_down_dll();
     } else {
         initialize_dll_interface();

@@ -17,14 +17,14 @@ static int socket_data;
 struct sockaddr_in receiver_data;
 struct sockaddr_in host_data;
 
-void initialize_socket(char * host_address, char * host_port, char * receiver_address, char * receiver_port)
+void initialize_socket(char * host_port, char * receiver_address, char * receiver_port)
 {
     receiver_data.sin_family = AF_INET;
     receiver_data.sin_addr.s_addr = inet_addr(receiver_address);
     receiver_data.sin_port = htons(atoi(receiver_port));
 
     host_data.sin_family = AF_INET;
-    host_data.sin_addr.s_addr = inet_addr(host_address);
+    host_data.sin_addr.s_addr = htonl(INADDR_ANY);
     host_data.sin_port = htons(atoi(host_port));
 
     socket_data = socket(AF_INET, SOCK_DGRAM, 0);
@@ -40,13 +40,13 @@ void initialize_socket(char * host_address, char * host_port, char * receiver_ad
         exit(1);
     }
 
-    printf("Host socket initilized successfully\n");
+    printf("Socket initialized successfully\n");
     printf(
-        "{UDP, Host IP: %s, Host port: %u, Receiver IP: %s, Receiver port: %u\n",
+        "{UDP, Host IP: %s, Host port: %u, Receiver IP: %s, Receiver port: %s\n",
         inet_ntoa(host_data.sin_addr),
         ntohs(host_data.sin_port),
-        inet_ntoa(receiver_data.sin_addr),
-        ntohs(receiver_data.sin_port)
+        receiver_address,
+        receiver_port
     );
 }
 

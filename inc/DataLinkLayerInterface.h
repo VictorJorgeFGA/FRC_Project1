@@ -1,7 +1,10 @@
 #ifndef _DATA_LINK_INTERFACE_H_
 #define _DATA_LINK_INTERFACE_H_
 
-#include "Params.h"
+#define CQ_HEADER_LEN 4
+#define CQ_MESSAGE_LEN 100
+#define CQ_DATA_MAX_LEN (CQ_HEADER_LEN + CQ_MESSAGE_LEN)
+#define CQ_MAX_DATA_AMOUNT 10
 
 // Inicializa a fila de comunicação interprocessos
 void initialize_dll_interface();
