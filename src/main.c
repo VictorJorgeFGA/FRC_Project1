@@ -12,7 +12,12 @@ int main(int argc, char ** argv)
 {
     if (argc > 2) {
         initialize_dll(argv[1], argv[2], argv[3], atoi(argv[4]));
-        // run_dll();
+        set_verbose_dll(1);
+
+        if (argv[5][0] == 'S')
+            set_operation_mode(SENDER);
+
+        run_dll();
         shut_down_dll();
     } else {
         initialize_dll_interface();

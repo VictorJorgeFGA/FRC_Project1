@@ -16,6 +16,8 @@
 // receiver_address - Endereço do par para enviar dados
 // receiver_port - Porta aberta pelo par para comunicação
 void initialize_dll(char * host_port, char * receiver_address, char * receiver_port, int t_pdu_size);
+
+// Encerra todos os serviços alocados pela camada de enlace de dados
 void shut_down_dll();
 
 // Roda o loop infinito da camada
@@ -24,7 +26,12 @@ void run_dll();
 // Altera para o modo verbose
 // 1 para ativar modo verboso
 // 0 para desativar
-void set_verbose(int value);
+void set_verbose_dll(int value);
+
+// Altera o modo de operação da camada de enlace de dados
+// RECEIVER para operar como destinatario
+// SENDER para operar como remetente
+void set_operation_mode(int value);
 
 // CORE DA CAMADA
 
@@ -73,7 +80,7 @@ static void get_data();
 // Bloqueia a execução da camada até que o frame seja enviado
 // com sucesso, i.e., o frame seja enviado e a confirmação seja
 // recebida.
-static void delivery_frame();
+static void send_frame_to_receiver();
 
 // Envia o frame salvo no buffer para o destinatario
 // Retorna 1 se não foi possível enviar o quadro completo
