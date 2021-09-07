@@ -47,7 +47,7 @@ int main(int argc, char ** argv)
                     argi++;
                 }
             }
-            initialize_dll(argv[1], argv[2], argv[3], pdu_size, verbose);
+            initialize_dll(argv[2], argv[3], argv[4], pdu_size, verbose);
         }
         else {
             show_help();
