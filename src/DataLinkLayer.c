@@ -195,7 +195,7 @@ void send_data()
 void send_frame_to_receiver()
 {
     int attempts = 0;
-    do {
+    while (1) {
         if (verbose)
             printf("%sSending frame %lld.\n", dll_info_msg_format, outcoming_frame_id);
 
@@ -208,12 +208,16 @@ void send_frame_to_receiver()
             attempts++;
         }
         if (attempts > 3) {
-            printf("%sResending frame due confirmation failure.\n");
+            printf("%sResending frame due confirmation failure.\n", dll_warning_msg_format);
             attempts = 0;
             continue;
         }
+        if (check_confirmation_frame())
+            continue;
 
-    } while (check_confirmation_frame());
+        break;
+    }
+    printf("quitando\n");
 }
 
 int send_frame()
