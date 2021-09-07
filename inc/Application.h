@@ -29,6 +29,6 @@ static int process_file(char *file_path);
 Recebe o nome do arquivo e monta os pacotes, presentes na fila, de tamanho
 chunk_size em um arquivo com esse nome
 */
-static void mount_file(char *filename);
+static void mount_file();
 
 #endif
