@@ -61,30 +61,7 @@ int main(int argc, char ** argv)
         // shut_down_dll();
     } else {
         initialize_dll_interface(NANO_TIMEOUT);
-        if (argv[1][0] == 'S') {
-            char cmd[150];
-            while (1)
-            {
-                printf("Enter the file name to be sent, or \\exit to exit: ");
-                scanf("%s", cmd);
-
-                if (cmd[0] == '\\')
-                    break;
-                else
-                    process_file(cmd);
-            }
-        } else {
-            while (1) {
-                char cmd[150];
-                printf("Enter the file name to be received, or \\exit to exit: ");
-                scanf("%s", cmd);
-
-                if (cmd[0] == '\\')
-                    break;
-                else
-                    mount_file(cmd);
-            }
-        }
+        run_app();
         shut_down_dll_interface();
     }
 
