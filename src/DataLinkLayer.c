@@ -24,19 +24,13 @@ static long long incoming_frame_id = 0;
 static char * outcoming_frame_buffer;
 static long long outcoming_frame_id = 0;
 
-static int layer_state;
-
 static const char * dll_error_msg_format = "(DLL) \033[0;31mERROR:\033[0m ";
 static const char * dll_warning_msg_format = "(DLL) \033[0;33mWARNING:\033[0m ";
 static const char * dll_success_msg_format = "(DLL) \033[0;32mSUCCESS:\033[0m ";
 static const char * dll_info_msg_format = "(DLL) \033[0;34mINFO:\033[0m ";
 
 static int verbose = 0;
-
 static int dll_is_running = 1;
-
-static int has_data_to_send = 0;
-static int has_data_to_receive = 0;
 
 void show_buffer(char * buffer, int buffer_len)
 {
@@ -97,12 +91,6 @@ void initialize_dll(char * host_port, char * receiver_address, char * receiver_p
 
     if (verbose)
         printf("%sInitialized in VERBOSE mode!\n", dll_info_msg_format);
-
-    // Retira lixo da fila
-    while (get_data_from_queue() != CQ_TIMEOUT)
-    {
-        printf("tirando lixo\n");
-    }
 
     run_dll();
     shut_down_dll();

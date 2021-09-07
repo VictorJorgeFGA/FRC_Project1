@@ -71,10 +71,6 @@ void process_receive_file()
 
 void run_app()
 {
-    // Tirando lixo da fila
-    int nothing;
-    while (get_timed_data_from_dll(cmd, &nothing) != CQ_TIMEOUT);
-
     while (app_running) {
         display_app_header();
 
@@ -109,12 +105,9 @@ void show_chunk(char * chunk, int chunk_len)
 int process_file(char *file_path)
 {
     FILE *fp;
-
-    printf("%s\n", file_path);
     fp = fopen(file_path, "r");
 
     if (fp == NULL) {
-        //Tratar erro de forma eficiente
         printf("Erro: %s\n", strerror(errno));
         mode = MENU;
         return 1;
@@ -133,15 +126,6 @@ int process_file(char *file_path)
     int bytes_sent = 0;
     long long int packages_sent = 0;
 
-    // Enviando nome do arquivo
-    for (int i = 0; 1; i++) {
-        chunk[i] = file_path[i];
-        if (file_path[i] == '\0')
-            break;
-    }
-    send_data_to_dll(chunk, CQ_DATA_MAX_LEN);
-
-    // printf("Sending file: %s\n", file_path);
     while (bytes_read = fread(chunk + CQ_HEADER_LEN, sizeof(char), CQ_MESSAGE_LEN, fp)) {
         *((int *)chunk) = bytes_read;
 
@@ -166,8 +150,8 @@ void mount_file()
     int chunk_len;
     int bytes_received = 0;
 
-    get_data_from_dll(filename, &chunk_len);
-    printf("\tRecebendo o arquivo %s\n", filename);
+    printf("\t\tDigite o nome do arquivo a ser salvo.\n");
+    scanf(" %s", filename);
 
     FILE *fp;
     fp = fopen(filename, "w");
