@@ -5,8 +5,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <signal.h>
-#include <sys/types.h>
 #include <errno.h>
 #include <unistd.h>
 
@@ -31,26 +29,6 @@ static const char * dll_info_msg_format = "(DLL) \033[0;34mINFO:\033[0m ";
 
 static int verbose = 0;
 static int dll_is_running = 1;
-
-void show_buffer(char * buffer, int buffer_len)
-{
-    printf("%d[", buffer_len);
-    for (int i = 0; i < buffer_len; i++) {
-        switch (buffer[i])
-        {
-        case 0xFF:
-            printf("1");
-            break;
-        case 0x0:
-            printf("0");
-
-        default:
-            printf("%c", buffer[i]);
-            break;
-        }
-    }
-    printf("]\n");
-}
 
 void initialize_dll(char * host_port, char * receiver_address, char * receiver_port, int t_pdu_size, int t_verbose)
 {
@@ -111,7 +89,6 @@ void run_dll()
         if (operation_mode == SENDER) {
             if (get_data_from_queue() == CQ_TIMEOUT) {
                 // Ninguem enviou nada via fila, checar socket
-                // printf("nada na fila\n");
                 operation_mode = RECEIVER;
                 continue;
             }
@@ -123,8 +100,8 @@ void run_dll()
                 int frame_status;
                 while (frame_status = receive_frame()) {
                     if (frame_status == SC_TIMEOUT) {
+                        // Ninguem enviou nada no socket, checar fila
                         operation_mode = SENDER;
-                        // printf("nada no socket\n");
                         break;
                     }
                     printf("%sFailed to receive frame %lld. Trying again...\n", dll_error_msg_format, incoming_frame_id);
@@ -134,8 +111,6 @@ void run_dll()
                     break;
 
                 get_frame_from_sender();
-
-
                 unpack_message_from_frame_buffer();
             }
             queue_buffer_pos = 0;
@@ -217,17 +192,6 @@ void send_data()
         printf("%sData from queue sent successfully.\n\n", dll_info_msg_format);
 }
 
-void get_data()
-{
-    if (verbose)
-        printf("%sReceiving message data.\n", dll_info_msg_format);
-
-
-
-    if (verbose && operation_mode == RECEIVER)
-        printf("%sMessage data received successfully.\n\n", dll_info_msg_format);
-}
-
 void send_frame_to_receiver()
 {
     do {
@@ -268,13 +232,7 @@ int check_confirmation_frame()
 
 int receive_frame()
 {
-    // ATT this is the waiting point for the RECEIVER mode
     int result = receive_data_through_socket(incoming_frame_buffer, pdu_size);
-
-    if (verbose && result != SC_TIMEOUT) {
-        printf("%sReceiving in: ", dll_info_msg_format);
-        show_buffer(incoming_frame_buffer, pdu_size);
-    }
     return result;
 }
 

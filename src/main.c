@@ -1,7 +1,4 @@
 #include "DataLinkLayer.h"
-// #include "SocketConnection.h"
-
-// TODO podar includes
 #include "Application.h"
 #include "DataLinkLayerInterface.h"
 #include <stdio.h>

@@ -13,7 +13,7 @@ static int app_running = 1;
 void display_app_header()
 {
     system("tput reset");
-    printf("\t\033[0;32mgamaTorrent\033[0m\n");
+    printf("------------------------- \033[0;32mgamaTorrent\033[0m -----------------------------------\n");
     printf("\t\tCompartilhe seus arquivos com qualquer um sem que a policia federal bata na sua porta!\n\n");
 }
 
@@ -164,6 +164,7 @@ void mount_file()
         int useful_msg_len = *((int *)chunk_data);
         if (useful_msg_len == 0)
             break;
+
         bytes_received += useful_msg_len;
 
         for (int i = CQ_HEADER_LEN; i < CQ_HEADER_LEN + useful_msg_len; i++) {
