@@ -98,6 +98,12 @@ void initialize_dll(char * host_port, char * receiver_address, char * receiver_p
     if (verbose)
         printf("%sInitialized in VERBOSE mode!\n", dll_info_msg_format);
 
+    // Retira lixo da fila
+    while (get_data_from_queue() != CQ_TIMEOUT)
+    {
+        printf("tirando lixo\n");
+    }
+
     run_dll();
     shut_down_dll();
 }

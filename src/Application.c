@@ -71,6 +71,10 @@ void process_receive_file()
 
 void run_app()
 {
+    // Tirando lixo da fila
+    int nothing;
+    while (get_timed_data_from_dll(cmd, &nothing) != CQ_TIMEOUT);
+
     while (app_running) {
         display_app_header();
 
