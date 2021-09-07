@@ -45,7 +45,7 @@ void display_send_file()
 void process_send_file()
 {
     scanf(" %s", cmd);
-    if (process_file(cmd))
+    if (process_file(cmd) == 0)
         printf("\033[0;32mArquivo enviado!\033[0m\n");
     else
         printf("\033[0;31mOcorreu um erro durante o envio do arquivo\033[0m\n");
@@ -62,7 +62,7 @@ void display_receive_file()
 
 void process_receive_file()
 {
-    printf("\tVocê está prestes a receber um arquivo. Digite algo para continuar.\n");
+    // printf("\tVocê está prestes a receber um arquivo. Digite algo para continuar.\n");
     mount_file("download.txt");
     printf("\033[0;32mArquivo recebido!\033[0m\n");
     printf("\033[0;33mDigite algo para continuar\033[0m.\n");
