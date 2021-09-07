@@ -62,8 +62,7 @@ void display_receive_file()
 
 void process_receive_file()
 {
-    // printf("\tVocê está prestes a receber um arquivo. Digite algo para continuar.\n");
-    mount_file("download.txt");
+    mount_file();
     printf("\033[0;32mArquivo recebido!\033[0m\n");
     printf("\033[0;33mDigite algo para continuar\033[0m.\n");
     scanf(" %s", cmd);
@@ -130,6 +129,14 @@ int process_file(char *file_path)
     int bytes_sent = 0;
     long long int packages_sent = 0;
 
+    // Enviando nome do arquivo
+    for (int i = 0; 1; i++) {
+        chunk[i] = file_path[i];
+        if (file_path[i] == '\0')
+            break;
+    }
+    send_data_to_dll(chunk, CQ_DATA_MAX_LEN);
+
     // printf("Sending file: %s\n", file_path);
     while (bytes_read = fread(chunk + CQ_HEADER_LEN, sizeof(char), CQ_MESSAGE_LEN, fp)) {
         *((int *)chunk) = bytes_read;
@@ -148,14 +155,20 @@ int process_file(char *file_path)
     return 0;
 }
 
-void mount_file(char *filename)
+void mount_file()
 {
+    char filename[255];
+
+    int chunk_len;
+    int bytes_received = 0;
+
+    get_data_from_dll(filename, &chunk_len);
+    printf("\tRecebendo o arquivo %s\n", filename);
+
     FILE *fp;
     fp = fopen(filename, "w");
 
     char chunk_data[CQ_DATA_MAX_LEN];
-    int chunk_len;
-    int bytes_received = 0;
 
     while(1) {
         get_data_from_dll(chunk_data, &chunk_len);
