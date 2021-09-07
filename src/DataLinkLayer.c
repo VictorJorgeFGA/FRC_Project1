@@ -194,15 +194,24 @@ void send_data()
 
 void send_frame_to_receiver()
 {
+    int attempts = 0;
     do {
         if (verbose)
             printf("%sSending frame %lld.\n", dll_info_msg_format, outcoming_frame_id);
 
-        while (send_frame())
+        while (send_frame()) {
             printf("%sFailed to send frame %lld. Trying again...\n", dll_error_msg_format, outcoming_frame_id);
+        }
 
-        while (get_confirmation_frame())
+        while (get_confirmation_frame() && attempts <= 3) {
             printf("%sFailed to receive confirmation frame. Trying again...\n", dll_error_msg_format);
+            attempts++;
+        }
+        if (attempts > 3) {
+            printf("%sResending frame due confirmation failure.\n");
+            attempts = 0;
+            continue;
+        }
 
     } while (check_confirmation_frame());
 }
