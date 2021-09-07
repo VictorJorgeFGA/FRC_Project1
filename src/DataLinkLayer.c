@@ -5,6 +5,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <signal.h>
+#include <sys/types.h>
+#include <errno.h>
+#include <unistd.h>
 
 static int operation_mode;
 
@@ -29,6 +33,11 @@ static const char * dll_info_msg_format = "(DLL) \033[0;34mINFO:\033[0m ";
 
 static int verbose = 0;
 
+static int dll_is_running = 1;
+
+static int has_data_to_send = 0;
+static int has_data_to_receive = 0;
+
 void show_buffer(char * buffer, int buffer_len)
 {
     printf("%d[", buffer_len);
@@ -49,10 +58,10 @@ void show_buffer(char * buffer, int buffer_len)
     printf("]\n");
 }
 
-void initialize_dll(char * host_port, char * receiver_address, char * receiver_port, int t_pdu_size)
+void initialize_dll(char * host_port, char * receiver_address, char * receiver_port, int t_pdu_size, int t_verbose)
 {
-    initialize_socket(host_port, receiver_address, receiver_port);
-    initialize_dll_interface();
+    initialize_socket(host_port, receiver_address, receiver_port, MICRO_TIMEOUT);
+    initialize_dll_interface(NANO_TIMEOUT);
 
     pdu_size = CQ_DATA_MAX_LEN + PDU_HEADER_SIZE;
     for (int i = 2; i < CQ_DATA_MAX_LEN; i++) {
@@ -82,8 +91,12 @@ void initialize_dll(char * host_port, char * receiver_address, char * receiver_p
         exit(1);
     }
 
+    verbose = t_verbose;
     operation_mode = RECEIVER;
-    printf("%sData Link Layer initialized as %s successfully!\n", dll_success_msg_format, operation_mode == SENDER ? "SENDER" : "RECEIVER");
+    printf("%sData Link Layer initialized as %s successfully with PID %d!\n", dll_success_msg_format, operation_mode == SENDER ? "SENDER" : "RECEIVER", getpid());
+
+    run_dll();
+    shut_down_dll();
 }
 
 void shut_down_dll()
@@ -97,14 +110,42 @@ void shut_down_dll()
 
 void run_dll()
 {
-    while (operation_mode == SENDER) {
-        get_data_from_queue();
-        send_data();
-    }
+    while (dll_is_running) {
+        if (operation_mode == SENDER) {
+            if (get_data_from_queue() == CQ_TIMEOUT) {
+                // Ninguem enviou nada via fila, checar socket
+                // printf("nada na fila\n");
+                operation_mode = RECEIVER;
+                continue;
+            }
+            send_data();
+        }
 
-    while (operation_mode == RECEIVER) {
-        get_data();
-        send_data_to_queue();
+        if (operation_mode == RECEIVER) {
+            while (queue_buffer_pos < QUEUE_BUFFER_SIZE - 1) {
+                int frame_status;
+                while (frame_status = receive_frame()) {
+                    if (frame_status == SC_TIMEOUT) {
+                        operation_mode = SENDER;
+                        // printf("nada no socket\n");
+                        break;
+                    }
+                    printf("%sFailed to receive frame %lld. Trying again...\n", dll_error_msg_format, incoming_frame_id);
+                }
+
+                if (operation_mode == SENDER)
+                    break;
+
+                get_frame_from_sender();
+
+
+                unpack_message_from_frame_buffer();
+            }
+            queue_buffer_pos = 0;
+
+            if (operation_mode == RECEIVER)
+                send_data_to_queue();
+        }
     }
 }
 
@@ -126,10 +167,10 @@ void set_operation_mode(int value)
         printf("%sNow operating as %s.\n", dll_info_msg_format, operation_mode == RECEIVER ? "RECEIVER" : "SENDER");
 }
 
-void get_data_from_queue()
+int get_data_from_queue()
 {
     int nothing;
-    get_data_from_app(queue_buffer, &nothing);
+    return get_timed_data_from_app(queue_buffer, &nothing);
 }
 
 void send_data_to_queue()
@@ -184,13 +225,9 @@ void get_data()
     if (verbose)
         printf("%sReceiving message data.\n", dll_info_msg_format);
 
-    while (queue_buffer_pos < QUEUE_BUFFER_SIZE - 1) {
-        get_frame_from_sender();
-        unpack_message_from_frame_buffer();
-    }
-    queue_buffer_pos = 0;
 
-    if (verbose)
+
+    if (verbose && operation_mode == RECEIVER)
         printf("%sMessage data received successfully.\n\n", dll_info_msg_format);
 }
 
@@ -234,8 +271,10 @@ int check_confirmation_frame()
 
 int receive_frame()
 {
+    // ATT this is the waiting point for the RECEIVER mode
     int result = receive_data_through_socket(incoming_frame_buffer, pdu_size);
-    if (verbose) {
+
+    if (verbose && result != SC_TIMEOUT) {
         printf("%sReceiving in: ", dll_info_msg_format);
         show_buffer(incoming_frame_buffer, pdu_size);
     }
@@ -246,9 +285,6 @@ void get_frame_from_sender()
 {
     if (verbose)
         printf("%sReceiving frame %lld.\n", dll_info_msg_format, incoming_frame_id);
-
-    while (receive_frame())
-        printf("%sFailed to receive frame %lld. Trying again...\n", dll_error_msg_format, incoming_frame_id);
 
     if (check_incoming_frame())
         while (send_error_confirmation_frame())

@@ -10,14 +10,17 @@
 #include <string.h> /* memset() */
 #include <stdlib.h>
 #include <errno.h>
+#include <sys/time.h>
 
 static int socket_data;
 
 // VARIAVEIS PARA SOQUETE
-struct sockaddr_in receiver_data;
-struct sockaddr_in host_data;
+static struct sockaddr_in receiver_data;
+static struct sockaddr_in host_data;
 
-void initialize_socket(char * host_port, char * receiver_address, char * receiver_port)
+static struct timeval timeout;
+
+void initialize_socket(char * host_port, char * receiver_address, char * receiver_port, long micro_timeout)
 {
     receiver_data.sin_family = AF_INET;
     receiver_data.sin_addr.s_addr = inet_addr(receiver_address);
@@ -40,6 +43,13 @@ void initialize_socket(char * host_port, char * receiver_address, char * receive
         exit(1);
     }
 
+    timeout.tv_sec = 0;
+    timeout.tv_usec = micro_timeout;
+
+    if (setsockopt(socket_data, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout)) < 0) {
+        printf("An error occurred when trying to set socket timeout.\n Error: %s\n", strerror(errno));
+    }
+
     printf("Socket initialized successfully\n");
     printf(
         "{UDP, Host IP: %s, Host port: %u, Receiver IP: %s, Receiver port: %s\n",
@@ -48,6 +58,7 @@ void initialize_socket(char * host_port, char * receiver_address, char * receive
         receiver_address,
         receiver_port
     );
+
 }
 
 void shut_down_socket()
@@ -65,5 +76,11 @@ int receive_data_through_socket(char * data_buffer, int data_buffer_size)
 {
     int receiver_data_size = sizeof(receiver_data);
     int bytes_read_amount = recvfrom(socket_data, data_buffer, data_buffer_size, 0, (struct sockaddr *) &receiver_data, &receiver_data_size);
+
+    if (bytes_read_amount == -1) {
+        if (errno == EAGAIN || errno == EWOULDBLOCK)
+            return SC_TIMEOUT;
+    }
+
     return bytes_read_amount != data_buffer_size;
 }

@@ -6,6 +6,9 @@
 
 #define PDU_HEADER_SIZE 8
 
+#define MICRO_TIMEOUT 100000L
+#define NANO_TIMEOUT 100000000L
+
 // INTERFACE DA CAMADA
 
 // Inicializa a camada de enlace de dados
@@ -15,7 +18,7 @@
 // host_port - Porta aberta para comunicação da camada que está executando este código
 // receiver_address - Endereço do par para enviar dados
 // receiver_port - Porta aberta pelo par para comunicação
-void initialize_dll(char * host_port, char * receiver_address, char * receiver_port, int t_pdu_size);
+void initialize_dll(char * host_port, char * receiver_address, char * receiver_port, int t_pdu_size, int t_verbose);
 
 // Encerra todos os serviços alocados pela camada de enlace de dados
 void shut_down_dll();
@@ -37,8 +40,9 @@ void set_operation_mode(int value);
 
 // FUNCOES PARA INTERFACE COM CAMADA N ---------
 
-// Interrompe a execução do programa até receber algum dado da fila e preenche o buffer com dados
-static void get_data_from_queue();
+// Interrompe a execução do programa por alguns instantes até receber algum dado da fila e preenche o buffer com dados
+// Caso ocorra um timeout será retornado TIMEOUT
+static int get_data_from_queue();
 
 // Interrompe a execução da camda até que seja possível empurrar os
 // dados recebidos para a camada acima

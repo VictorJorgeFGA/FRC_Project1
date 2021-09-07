@@ -34,6 +34,7 @@ void process_file(char *file_path)
     char chunk[CQ_DATA_MAX_LEN];
 
     int bytes_read;
+
     printf("Sending file: %s\n", file_path);
     while (bytes_read = fread(chunk + CQ_HEADER_LEN, sizeof(char), CQ_MESSAGE_LEN, fp)) {
         *((int *)chunk) = bytes_read;
@@ -64,6 +65,8 @@ void mount_file(char *filename)
         int useful_msg_len = *((int *)chunk_data);
         if (useful_msg_len == 0)
             break;
+        else
+            printf("Useful length = %d\n", useful_msg_len);
 
 #ifdef DEBUG
         show_chunk(chunk_data, CQ_DATA_MAX_LEN);
