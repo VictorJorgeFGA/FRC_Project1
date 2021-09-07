@@ -95,6 +95,9 @@ void initialize_dll(char * host_port, char * receiver_address, char * receiver_p
     operation_mode = RECEIVER;
     printf("%sData Link Layer initialized as %s successfully with PID %d!\n", dll_success_msg_format, operation_mode == SENDER ? "SENDER" : "RECEIVER", getpid());
 
+    if (verbose)
+        printf("%sInitialized in VERBOSE mode!\n", dll_info_msg_format);
+
     run_dll();
     shut_down_dll();
 }
