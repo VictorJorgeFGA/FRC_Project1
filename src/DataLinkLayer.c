@@ -217,7 +217,6 @@ void send_frame_to_receiver()
 
         break;
     }
-    printf("quitando\n");
 }
 
 int send_frame()
